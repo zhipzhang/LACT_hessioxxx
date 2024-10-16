@@ -510,6 +510,39 @@ extern "C" {
 #  define H_MAX_SLICES     128  /**< Maximum number of time slices handled. */
 # endif
 #endif
+
+// Parameters for LACT_PROD0!
+#ifdef LACT_PROD0
+#ifdef H_MAX_TEL
+#undef H_MAX_TEL
+#endif
+#define H_MAX_TEL 32
+#ifdef H_MAX_PIX
+#undef H_MAX_PIX
+#endif
+#define H_MAX_PIX 3000
+#ifdef H_MAX_GAINS
+#undef H_MAX_GAINS
+#endif
+#define H_MAX_GAINS 2
+#ifdef H_MAX_PIXSECTORS
+#undef H_MAX_PIXSECTORS
+#endif
+#define H_MAX_PIXSECTORS 19
+#ifdef H_MAX_DRAWERS
+#undef H_MAX_DRAWERS
+#endif
+#define H_MAX_DRAWERS H_MAX_PIX
+#ifdef H_MAX_SECTORS
+#undef H_MAX_SECTORS
+#endif
+#define H_MAX_SECTORS H_MAX_PIX * 2
+#ifdef H_MAX_SLICES
+#undef H_MAX_SLICES
+#define H_MAX_SLICES 128
+#endif
+#endif
+
 #define H_MAX_HOTPIX     5     /**< The max. size of the list of hottest pix. */
 #define H_MAX_PROFILE    10    /**< The max. number of MC shower profiles. */
 #define H_MAX_D_TEMP     8

@@ -148,7 +148,7 @@ else
 LIBHESSIOPP_LO := $(patsubst %.cc,out/%.lo,$(filter %.cc,$(LIBHESSIOPP_SOURCES_NOPATH)))
 endif
 
-DEFINES = -DCTA $(EXTRA_DEFINES)
+DEFINES =  $(EXTRA_DEFINES)
 CDEBUGFLAGS = -g
 ifeq ($(WITH_GCC),1)
  ifneq ($(shell echo $(GCC_VERSION) | egrep '4\.[2-9]\.'),)

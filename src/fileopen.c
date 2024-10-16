@@ -1135,6 +1135,79 @@ static FILE *ssh_popen (const char *fname, const char *mode, int compression)
 
    return f;
 }
+static FILE *xrootd_popen(const char *fname, const char *mode, int compression);
+static FILE *xrootd_popen(const char *fname, const char *mode, int compression)
+{
+    char get_cmd[1024];
+    snprintf(get_cmd, sizeof(get_cmd), "xrdcp -f %s -", fname);
+    const char *cmp_cmd = "";  /* Decompression of data */
+    char *s;             /* Full fifo command with redirection */
+    FILE *f = NULL;      /* File pointer returned */
+
+    if (fname == NULL || mode == NULL)
+        return NULL;
+
+    if (*mode != 'r') /* Only read-mode is supported. */
+    {
+        fprintf(stderr, "Cannot write to %s.\n", fname);
+        errno = EPERM;
+        return NULL;
+    }
+    errno = 0;
+    
+    /* Set up compression command based on compression type */
+    switch (compression)
+    {
+        case 1:
+            cmp_cmd = parallel ? " | pigz -d" : " | gzip -d";
+            break;
+        case 2:
+            cmp_cmd = parallel ? " | pbzip2 -d" : " | bzip2 -d";
+            break;
+        case 3:
+            cmp_cmd = " | lzop -d";
+            break;
+        case 4:
+            cmp_cmd = " | lzma -d";
+            break;
+        case 5:
+            cmp_cmd = " | xz -d";
+            break;
+        case 6:
+            cmp_cmd = " | lz4 -d";
+            break;
+        case 7:
+            cmp_cmd = " | tar zxOf -";
+            break;
+        case 9:
+            cmp_cmd = " | tar xOf - | zcat";
+            break;
+        case 10:
+            cmp_cmd = " | zstd -d";
+            break;
+        case 11:
+            cmp_cmd = " | tar xOf - | zstd -d";
+            break;
+    }
+
+    s = (char *) malloc(strlen(get_cmd) + strlen(fname) + strlen(cmp_cmd) + 3);
+    if (s == NULL)
+        return NULL;
+    strcpy(s, get_cmd);
+    strcat(s, cmp_cmd);
+
+    f = popenx(s, "r");
+    if (verbose)
+    {
+        if (f != NULL)
+            fprintf(stderr, "Fileopen success: mode 'r' with command %s\n", s);
+        else
+            fprintf(stderr, "Fileopen failed: mode 'r' with command %s\n", s);
+    }
+    free(s);
+
+    return f;
+}
 
 /** Search for a file in the include path list and open it if possible. */
 
@@ -1223,6 +1296,8 @@ FILE *fileopen (const char *fname, const char *mode)
          return uri_popen(fname,mode,compression);
       if ( strncmp(fname,"ssh://",6) == 0 )
          return ssh_popen(fname,mode,compression);
+      if (strncmp(fname,"root://",7) == 0)
+         return xrootd_popen(fname,mode,compression);
    }
 
    /* For modes other than read-only, no search is done. */
@@ -1531,3 +1606,4 @@ int fileclose (FILE *f)
    }
    return rc;
 }
+
