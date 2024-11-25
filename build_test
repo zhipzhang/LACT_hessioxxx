@@ -1,0 +1,76 @@
+#!/bin/bash
+
+function run_build {
+
+if [ -z "${CC}" ]; then
+   CC="gcc"
+fi
+
+if [ -z "${CXX}" ]; then
+   CXX="g++"
+fi
+
+list="HESS_PHASE_1 HESS_PHASE_2 HESS_PHASE_3 \
+  CTA CTA_ULTRA CTA_ULTRA=5 CTA_MAX CTA_PROD1 CTA_PROD2 CTA_PROD3 \
+  CTA_PROD4 CTA_MINI4 CTA_PROD4_SC CTA_PROD4_DEMO \
+  CTA_SC CTA_SC=1 CTA_SC=2 CTA_SC=3 CTA_SC=4 CTA_PROD2_SC CTA_MAX_SC \
+  MEGAPIX"
+
+if [ ! -z "$1" ]; then
+   list="$@"
+fi 
+
+for k in $list; do
+   echo ''
+   echo ''
+   echo ''
+   echo ''
+   echo '************************************************************************'
+   echo '*'
+   echo "* Building hessio library for configuration '$k' with ${CC}/${CXX}."
+   echo '*'
+   echo '************************************************************************'
+   echo ''
+   echo make clean
+   make clean
+   echo make CC="${CC}" CXX="${CXX}" EXTRA_DEFINES="-D$k"
+   make CC="${CC}" CXX="${CXX}" EXTRA_DEFINES="-D$k" || exit 1
+   echo ''
+   echo "* Configuration '$k' successfully built with ${CC}/${CXX}."
+   echo ''
+#   make CC="${CC}" CXX="${CXX}" EXTRA_DEFINES="-D$k" install || exit 1
+   bin/read_hess -v --version || exit 1
+   echo ''
+   echo "* Configuration '$k' seems to work."
+   echo ''   
+done
+
+}
+
+if [ "$1" = "-s" ]; then # short run
+   run_build || exit 1
+   exit
+fi
+
+# Compile with system gcc/g++ compilers
+CC=gcc CXX=g++ run_build || exit 1
+
+# Compile with alternate gcc/g++ compilers (not working for everyone)
+for cvers in 4.8.5 4.9.4 5.4 6.5 7.3 8.2 9.1; do
+   wcomp="$(which gcc${cvers} 2>/dev/null)"
+   if [ ! -z "$wcomp" ]; then
+      CC="gcc${cvers}" CXX="g++${cvers}" run_build || exit 1
+   fi
+done
+
+# Compile with system clang/clang++ compilers (assuming we have one)
+CC=clang CXX=clang++ run_build || exit 1
+
+# Compile with alternate clang/clang++ compilers (again not for everyone)
+for cvers in 7 8 9; do
+   wcomp="$(which clang${cvers} 2>/dev/null)"
+   if [ ! -z "$wcomp" ]; then
+      CC="clang${cvers}" CXX="clang++${cvers}" run_build || exit 1
+   fi
+done
+
