@@ -14,11 +14,11 @@ set( HESSIO_SOURCES
                     io_trgmask.c
                     straux.c 
                     warning.c 
-                    io_hess.c)
+                    io_hess.c
+                    mc_atmprof.c)
 include_directories( ${PROJECT_SOURCE_DIR}/include )
 
 set( HESSIO_HEADERS
-       ${PROJECT_SOURCE_DIR}/include/history.h
        ${PROJECT_SOURCE_DIR}/include/initial.h
        ${PROJECT_SOURCE_DIR}/include/io_basic.h 
        ${PROJECT_SOURCE_DIR}/include/io_histogram.h 
