@@ -366,6 +366,7 @@ int read_history (IO_BUFFER *iobuf, HistoryContainer *hc)
             hc->cmdline->time = t;
             hc->cmdline->text = strdup(line);
          }
+         get_item_end(iobuf,&sub_item_header);
       }
       else if ( type == IO_TYPE_CFG_HIST )
       {
@@ -394,6 +395,7 @@ int read_history (IO_BUFFER *iobuf, HistoryContainer *hc)
             pos->time = t;
             pos->text = strdup(line);
             pos->next = NULL;
+            get_item_end(iobuf,&sub_item_header);
          }
          else if ( strncmp(line,"# Telescope-specific configuration follows",40) == 0 )
          {
@@ -422,6 +424,7 @@ int read_history (IO_BUFFER *iobuf, HistoryContainer *hc)
             pos->time = t;
             pos->text = strdup(line);
             pos->next = NULL;
+            get_item_end(iobuf,&sub_item_header);
          }
          else
          {
@@ -432,6 +435,7 @@ int read_history (IO_BUFFER *iobuf, HistoryContainer *hc)
             pos->time = t;
             pos->text = strdup(line);
             pos->next = NULL;
+            get_item_end(iobuf, &sub_item_header);
          }
       }
       else
