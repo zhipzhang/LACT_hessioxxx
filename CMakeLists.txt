@@ -33,7 +33,17 @@ set_property( CACHE BuildConfig PROPERTY STRINGS
               LACT_PROD0)
 
 message(STATUS "BuildConfig='${BuildConfig}'")
-add_definitions(-D${BuildConfig})
+#add_definitions(-D${BuildConfig})
+
+# for pylast, we just hard-code the config for lact_prod0
+add_definitions(
+    -DMAXIMUM_TELESCOPES=32
+    -DMAXIMUM_PIXELS=3000
+    -DMAXIMUM_SECTORS=6000
+    -DMAXIMUM_PIXELSECTORS=19
+    -DMAXIMUM_DRAWERS=3000
+    -DMAXIMUM_SLICES=128
+)
 
 # these should be detected using cmake's config stuff instead of hard-coded:
 # add_definitions(-DHAVE_STD_VECTOR -DHAVE_STD_VALARRAY -DHAVE_STD_STRING -DHAVE_64BIT_INT -DSIXTY_FOUR_BITS)
